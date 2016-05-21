@@ -5,21 +5,7 @@
 #ifndef SORTDEMO_SORTDEMORENDERER_H
 #define SORTDEMO_SORTDEMORENDERER_H
 
-#include <GLES3/gl3.h>
 #include "SharedDefines.h"
-
-static inline bool32 CheckGL(const char* pszFile, int32 nLine)
-{
-    GLenum eError = glGetError();
-    if (eError != GL_NO_ERROR)
-    {
-        LOGE("%s::%d (0x%X)\n", pszFile, nLine, eError);
-        return false;
-    }
-    return true;
-}
-
-#define CHECKGL CheckGL(__FILE__, __LINE__)
 
 class SortDemoRenderer {
 public:
