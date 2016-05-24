@@ -14,7 +14,6 @@ public:
     struct TMeshInfo
     {
         const char* pszMeshObjectFile;
-        const char*pszMeshMaterialFile;
     };
 
     SDMesh();

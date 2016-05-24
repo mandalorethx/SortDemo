@@ -16,15 +16,8 @@ public:
     void   DrawFrame();
     void   DestroyRenderer();
 private:
-    GLuint LoadShader(GLenum shaderType, const char* pSource);
-    GLuint LoadShaderFile(GLenum shaderType, const char* pFile);
-
     uint32 m_nWidth;
     uint32 m_nHeight;
-
-    GLuint m_nVs;
-    GLuint m_nFs;
-    GLuint m_nProgram;
 };
 
 

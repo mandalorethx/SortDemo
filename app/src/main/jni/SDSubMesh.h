@@ -25,6 +25,17 @@ public:
         uint32 nNumIndices;
     };
 
+    struct TMaterial
+    {
+        TVec3 vKa;
+        TVec3 vKd;
+        TVec3 vKs;
+        float fNi;
+        float fD;
+        int32 nIllum;
+    };
+
+
     SDSubMesh();
     ~SDSubMesh();
 
@@ -33,20 +44,21 @@ public:
 
     bool32 UploadVertexData(TVec3* pPos, TVec3* pNormals, TVec2* pCoord);
     bool32 UploadIndexData(uint32* pIndices);
+    void   SetMaterial(TMaterial material){m_material=  material;};
     bool32 SetTexture(uint32 nLoc, GLuint hTexId);
     bool32 SetMVP(uint32 nLoc, TMat4 mMvp);
 
     void Draw();
 private:
-    uint32 m_nVertexCount;
-    uint32 m_nIndexCount;
-    GLuint m_hVbo;
-    GLuint m_hIbo;
-    uint32 m_nTextureLocation;
-    GLuint m_hTexture;
-    uint32 m_nMatrixLocation;
-    TMat4  m_mMvp;
-
+    uint32    m_nVertexCount;
+    uint32    m_nIndexCount;
+    GLuint    m_hVbo;
+    GLuint    m_hIbo;
+    uint32    m_nTextureLocation;
+    GLuint    m_hTexture;
+    uint32    m_nMatrixLocation;
+    TMat4     m_mMvp;
+    TMaterial m_material;
 };
 
 

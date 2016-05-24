@@ -57,6 +57,7 @@ void SDSubMesh::Destroy()
 
 bool32 SDSubMesh::UploadVertexData(TVec3* pPos, TVec3* pNormals, TVec2* pCoord)
 {
+    // TODO - make more general, so it is OK if tex coords are NULL
     glBindBuffer(GL_ARRAY_BUFFER, m_hVbo); CHECKGL;
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_nVertexCount*sizeof(TVec3), pPos); CHECKGL;
     glBufferSubData(GL_ARRAY_BUFFER, m_nVertexCount*sizeof(TVec3), m_nVertexCount*sizeof(TVec3), pNormals); CHECKGL;

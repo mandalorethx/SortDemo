@@ -9,6 +9,7 @@
 #include <android/log.h>
 #include <GLES2/gl2.h>
 #include <cstring>
+#include <cstdio>
 
 #define  LOG_TAG    "SortDemoRenderer"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
@@ -59,12 +60,27 @@ struct TMat4
     TMat4() : cX(), cY(), cZ(), cW() {}
 };
 
+static inline void ErrorMessage(const char* pszFile, int32 nLine, const char* pszFormat, ...)
+{
+    va_list vl;
+    va_start(vl, pszFormat);
+
+    char pszTmpString[1024];
+    vsprintf(pszTmpString, pszFormat, vl);
+
+    va_end(vl);
+
+    LOGE("%s::%d %s\n", pszFile, nLine, pszTmpString);
+};
+
+#define ERROR_MSG(...) ErrorMessage(__FILE__, __LINE__, __VA_ARGS__)
+
 static inline bool32 CheckGL(const char* pszFile, int32 nLine)
 {
     GLenum eError = glGetError();
     if (eError != GL_NO_ERROR)
     {
-        LOGE("%s::%ld (0x%X)\n", pszFile, nLine, eError);
+        ErrorMessage(pszFile, nLine, "(0x%X)", eError);
         return false;
     }
     return true;
