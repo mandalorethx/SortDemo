@@ -14,7 +14,8 @@ public:
     struct TLoadedMaterial
     {
         SDSubMesh::TMaterial material;
-        const char*          pszName;
+        char*                pszName;
+        TLoadedMaterial() : material(), pszName(NULL) {}
     };
     static bool32 ParseMeshFile(const char* pszMeshFile, SDStack* pSubObjects);
 private:

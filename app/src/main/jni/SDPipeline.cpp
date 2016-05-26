@@ -28,8 +28,8 @@ SDPipeline::~SDPipeline()
 bool32 SDPipeline::Create(void* pInfo)
 {
     TPipelineInfo* pPipelineInfo = SOFT_CAST(TPipelineInfo*, pInfo);
-    m_nVs = LoadShaderFile(GL_VERTEX_SHADER, pPipelineInfo->pszVertexShaderFile);
-    m_nFs = LoadShaderFile(GL_FRAGMENT_SHADER, pPipelineInfo->pszVertexShaderFile);
+    m_nVs = LoadShader(GL_VERTEX_SHADER, pPipelineInfo->pszVertexShaderFile);
+    m_nFs = LoadShader(GL_FRAGMENT_SHADER, pPipelineInfo->pszVertexShaderFile);
 
     m_nProgram = glCreateProgram(); CHECKGL;
     glAttachShader(m_nProgram, m_nVs); CHECKGL;
@@ -82,6 +82,44 @@ void SDPipeline::SetCulling(bool32 bEnabled)
 void SDPipeline::SetCullFace(GLenum eFace)
 {
     m_eCullFace = eFace;
+}
+
+void SDPipeline::Start() {
+    glUseProgram(m_nProgram); CHECKGL;
+    if (m_bAlphaEnabled) {
+        glEnable(GL_BLEND); CHECKGL;
+        glBlendEquation(GL_FUNC_ADD); CHECKGL;
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL;
+    }
+    else {
+        glDisable(GL_BLEND);
+    }
+    if (m_bCullEnabled) {
+        glEnable(GL_CULL_FACE); CHECKGL;
+        glFrontFace(m_eCullFace); CHECKGL;
+    }
+    else {
+        glDisable(GL_CULL_FACE); CHECKGL;
+    }
+    if (m_bDepthEnabled) {
+        glEnable(GL_DEPTH_TEST); CHECKGL;
+        glDepthFunc(m_eDepthFunc); CHECKGL;
+        glClearDepthf(m_fDepthValue); CHECKGL;
+        glClear(GL_DEPTH_BUFFER_BIT); CHECKGL;
+    } else {
+        glDisable(GL_DEPTH_TEST); CHECKGL;
+    }
+
+    glClearColor(0.0, 0.0, 0.0, 1.0); CHECKGL;
+    glClear(GL_COLOR_BUFFER_BIT); CHECKGL;
+}
+
+void SDPipeline::End() {
+    glUseProgram(0); CHECKGL;
+    glEnable(GL_BLEND); CHECKGL;
+    glEnable(GL_CULL_FACE); CHECKGL;
+    glEnable(GL_DEPTH_TEST); CHECKGL;
+
 }
 
 GLuint SDPipeline::LoadShader(GLenum shaderType, const char* pSource)

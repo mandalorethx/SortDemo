@@ -15,7 +15,7 @@ model {
 
         ndk {
             platformVersion = 21
-            moduleName = 'sort_demo_shared'
+            moduleName = 'SortDemoRenderer'
             toolchain = 'clang'
             stl        = 'gnustl_static'
             cppFlags.addAll(['-std=c++11','-Wall'])

@@ -70,7 +70,7 @@ static inline void ErrorMessage(const char* pszFile, int32 nLine, const char* ps
 
     va_end(vl);
 
-    LOGE("%s::%d %s\n", pszFile, nLine, pszTmpString);
+    LOGE("%s::%ld %s\n", pszFile, nLine, pszTmpString);
 };
 
 #define ERROR_MSG(...) ErrorMessage(__FILE__, __LINE__, __VA_ARGS__)

@@ -28,6 +28,8 @@ public:
     void SetDepthValue(float fVal);
     void SetCulling(bool32 bEnabled);
     void SetCullFace(GLenum eFace);
+    void Start();
+    void End();
 private:
     GLuint LoadShader(GLenum shaderType, const char* pSource);
     GLuint LoadShaderFile(GLenum shaderType, const char* pFile);

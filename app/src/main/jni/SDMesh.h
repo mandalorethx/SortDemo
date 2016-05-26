@@ -22,8 +22,8 @@ public:
     virtual bool32 Create(void* pInfo);
     virtual void Destroy();
 
-    void SetTexture(uint32 nLoc, uint32 nSubMesh, GLuint hTexture);
-    void SetMVP(uint32 nLoc, TMat4 mMvp);
+    void SetTexture(uint32 nSubMesh, GLuint hTexture);
+    void SetMVP(TMat4 mMvp);
 
     void Draw();
 private:

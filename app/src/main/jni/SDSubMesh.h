@@ -30,9 +30,26 @@ public:
         TVec3 vKa;
         TVec3 vKd;
         TVec3 vKs;
+        float fNs;
         float fNi;
         float fD;
         int32 nIllum;
+
+        TMaterial() : vKa(), vKd(), vKs(), fNs(0.f), fD(0.f), nIllum(0) {}
+    };
+
+    enum EUniformLocation
+    {
+        UNIFORM_TEXTURE,
+        UNIFORM_MVP,
+        UNIFORM_KA,
+        UNIFORM_KD,
+        UNIFORM_KS,
+        UNIFORM_NS,
+        UNIFORM_NI,
+        UNIFORM_D,
+        UNIFORM_ILLUM,
+        NumUniforms,
     };
 
 
@@ -42,23 +59,29 @@ public:
     virtual bool32 Create(void* pInfo);
     virtual void   Destroy();
 
-    bool32 UploadVertexData(TVec3* pPos, TVec3* pNormals, TVec2* pCoord);
+    bool32 UploadVertexData(TVec3* pPos, TVec3* pNormals, TVec3* pCoord);
     bool32 UploadIndexData(uint32* pIndices);
     void   SetMaterial(TMaterial material){m_material=  material;};
-    bool32 SetTexture(uint32 nLoc, GLuint hTexId);
-    bool32 SetMVP(uint32 nLoc, TMat4 mMvp);
+    bool32 SetTexture(GLuint hTexId);
+    bool32 SetMVP(TMat4 mMvp);
 
     void Draw();
 private:
-    uint32    m_nVertexCount;
-    uint32    m_nIndexCount;
-    GLuint    m_hVbo;
-    GLuint    m_hIbo;
-    uint32    m_nTextureLocation;
-    GLuint    m_hTexture;
-    uint32    m_nMatrixLocation;
-    TMat4     m_mMvp;
-    TMaterial m_material;
+    struct TAttributeBinding
+    {
+        ESubMeshAttributes eAttribute;
+        uint32             nSize;
+        GLenum             eType;
+        size_t             nOffset;
+    };
+    uint32            m_nVertexCount;
+    uint32            m_nIndexCount;
+    GLuint            m_hVbo;
+    GLuint            m_hIbo;
+    GLuint            m_hTexture;
+    TMat4             m_mMvp;
+    TMaterial         m_material;
+    TAttributeBinding m_vBindings[NumAttribs];
 };
 
 
