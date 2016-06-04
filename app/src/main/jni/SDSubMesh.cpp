@@ -4,61 +4,45 @@
 
 #include "SDSubMesh.h"
 
-SDSubMesh::SDSubMesh()
-{
+SDSubMesh::SDSubMesh() {
     m_nVertexCount = 0;
-    m_nIndexCount = 0;
     m_hVbo = 0;
-    m_hIbo = 0;
     m_hTexture = 0;
     m_mMvp = TMat4();
 
     memset(m_vBindings, 0, sizeof(m_vBindings));
 }
 
-SDSubMesh::~SDSubMesh()
-{
+SDSubMesh::~SDSubMesh() {
     Destroy();
 }
 
-bool32 SDSubMesh::Create(void* pInfo)
-{
+bool32 SDSubMesh::Create(void* pInfo) {
     TSubMeshInfo* pMeshInfo = SOFT_CAST(TSubMeshInfo*, pInfo);
     m_nVertexCount = pMeshInfo->nNumVertices;
-    m_nIndexCount = pMeshInfo->nNumIndices;
 
     glGenBuffers(1, &m_hVbo); CHECKGL;
     glBindBuffer(GL_ARRAY_BUFFER, m_hVbo); CHECKGL;
-    glBufferData(GL_ARRAY_BUFFER, m_nVertexCount*3*sizeof(TVec3),NULL, GL_STATIC_DRAW); CHECKGL;
+    glBufferData(GL_ARRAY_BUFFER, m_nVertexCount*3*sizeof(TVec3), NULL, GL_STATIC_DRAW); CHECKGL;
     glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL;
 
-    glGenBuffers(1, &m_hIbo); CHECKGL;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIbo); CHECKGL;
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nIndexCount*sizeof(GLuint),NULL, GL_STATIC_DRAW); CHECKGL;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); CHECKGL;
-
+    return true;
 }
 
-void SDSubMesh::Destroy()
-{
+void SDSubMesh::Destroy() {
     glDeleteBuffers(1, &m_hVbo);
-    glDeleteBuffers(1, &m_hIbo);
     glDeleteTextures(1, &m_hTexture);
 
     m_nVertexCount = 0;
-    m_nIndexCount = 0;
     m_hVbo = 0;
-    m_hIbo = 0;
     m_hTexture = 0;
     m_mMvp = TMat4();
 }
 
-bool32 SDSubMesh::UploadVertexData(TVec3* pPos, TVec3* pNormals, TVec3* pCoord)
-{
+bool32 SDSubMesh::UploadVertexData(TVec3* pPos, TVec3* pNormals, TVec3* pCoord) {
     size_t nCurOffset = 0;
     glBindBuffer(GL_ARRAY_BUFFER, m_hVbo); CHECKGL;
-    if (pPos != NULL)
-    {
+    if (pPos != NULL) {
         m_vBindings[ATTRIB_POSITION].eAttribute = ATTRIB_POSITION;
         m_vBindings[ATTRIB_POSITION].nSize      = 3;
         m_vBindings[ATTRIB_POSITION].eType      = GL_FLOAT;
@@ -111,29 +95,21 @@ bool32 SDSubMesh::UploadVertexData(TVec3* pPos, TVec3* pNormals, TVec3* pCoord)
         free(pTmpCoords);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL;
+    return true;
 
 }
 
-bool32 SDSubMesh::UploadIndexData(uint32* pIndices)
-{
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIbo); CHECKGL;
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, m_nIndexCount*sizeof(GLuint), pIndices); CHECKGL;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); CHECKGL;
-
-}
-
-bool32 SDSubMesh::SetTexture(GLuint hTexId)
-{
+bool32 SDSubMesh::SetTexture(GLuint hTexId) {
     m_hTexture = hTexId;
+    return true;
 }
 
-bool32 SDSubMesh::SetMVP(TMat4 mMvp)
-{
+bool32 SDSubMesh::SetMVP(TMat4 mMvp) {
     m_mMvp = mMvp;
+    return true;
 }
 
-void SDSubMesh::Draw()
-{
+void SDSubMesh::Draw() {
     if (m_hTexture != 0) {
         glActiveTexture(GL_TEXTURE0);
         CHECKGL;
@@ -145,16 +121,15 @@ void SDSubMesh::Draw()
 
     glUniformMatrix4fv(UNIFORM_MVP, 1, GL_FALSE, HARD_CAST(float*, &m_mMvp)); CHECKGL;
 
-    glUniform3fv(UNIFORM_KA, 1, HARD_CAST(float*, &m_material.vKa)); CHECKGL;
-    glUniform3fv(UNIFORM_KS, 1, HARD_CAST(float*, &m_material.vKs)); CHECKGL;
-    glUniform3fv(UNIFORM_KD, 1, HARD_CAST(float*, &m_material.vKd)); CHECKGL;
-    glUniform1f(UNIFORM_NS, m_material.fNs); CHECKGL;
-    glUniform1f(UNIFORM_NI, m_material.fNi); CHECKGL;
-    glUniform1f(UNIFORM_D, m_material.fD); CHECKGL;
-    glUniform1i(UNIFORM_ILLUM, m_material.nIllum); CHECKGL;
+//    glUniform3fv(UNIFORM_KA, 1, HARD_CAST(float*, &m_material.vKa)); CHECKGL;
+//    glUniform3fv(UNIFORM_KS, 1, HARD_CAST(float*, &m_material.vKs)); CHECKGL;
+//    glUniform3fv(UNIFORM_KD, 1, HARD_CAST(float*, &m_material.vKd)); CHECKGL;
+//    glUniform1f(UNIFORM_NS, m_material.fNs); CHECKGL;
+//    glUniform1f(UNIFORM_NI, m_material.fNi); CHECKGL;
+//    glUniform1f(UNIFORM_D, m_material.fD); CHECKGL;
+//    glUniform1i(UNIFORM_ILLUM, m_material.nIllum); CHECKGL;
 
     glBindBuffer(GL_ARRAY_BUFFER, m_hVbo); CHECKGL;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIbo); CHECKGL;
 
     for (uint32 nAttrib = 0; nAttrib < NumAttribs; ++nAttrib) {
         if (m_vBindings[nAttrib].eAttribute != NumAttribs) {
@@ -168,7 +143,8 @@ void SDSubMesh::Draw()
         }
     }
 
-    glDrawElements(GL_TRIANGLES, m_nIndexCount, GL_UNSIGNED_INT, NULL); CHECKGL;
+    //glDrawElements(GL_TRIANGLES, m_nIndexCount, GL_UNSIGNED_INT, NULL); CHECKGL;
+    glDrawArrays(GL_TRIANGLES, 0, m_nVertexCount); CHECKGL;
 
     for (uint32 nAttrib = 0; nAttrib < NumAttribs; ++nAttrib) {
         if (m_vBindings[nAttrib].eAttribute != NumAttribs) {
@@ -177,7 +153,6 @@ void SDSubMesh::Draw()
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); CHECKGL;
 
     glBindTexture(GL_TEXTURE_2D, 0); CHECKGL;
 }

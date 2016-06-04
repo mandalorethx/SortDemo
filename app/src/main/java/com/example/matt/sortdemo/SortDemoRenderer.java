@@ -11,5 +11,6 @@ public class SortDemoRenderer {
     public static native void create_renderer(int width, int height);
     public static native void destroy_renderer();
     public static native void draw_frame();
-    public static native void add_mesh(String pszFile);
+    public static native void update_viewport(int width, int height);
+    //public static native void add_mesh(String pszFile);
 }

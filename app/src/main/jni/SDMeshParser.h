@@ -11,17 +11,9 @@
 
 class SDMeshParser {
 public:
-    struct TLoadedMaterial
-    {
-        SDSubMesh::TMaterial material;
-        char*                pszName;
-        TLoadedMaterial() : material(), pszName(NULL) {}
-    };
-    static bool32 ParseMeshFile(const char* pszMeshFile, SDStack* pSubObjects);
+    static bool32 ParseMeshFile(const char* pszBasePath, const char* pszMeshFile, SDStack* pSubObjects);
 private:
-    static bool32 ParseMaterialFile(const char* pszMaterialFile, SDStack* pMaterials);
-    static void FillSubMesh(SDStack* pPositionStack, SDStack* pNormalStack, SDStack* pTexcoordStack, SDStack* pIndexStack, SDSubMesh* pSubMesh);
-    static void ResetStacks(SDStack* pPositionStack, SDStack* pNormalStack, SDStack* pTexcoordStack, SDStack* pIndexStack);
+    static void FillSubMesh(SDStack* pPositionStack, SDStack* pNormalStack, SDStack* pTexcoordStack, SDSubMesh* pSubMesh);
 };
 
 

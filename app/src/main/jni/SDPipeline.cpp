@@ -28,8 +28,8 @@ SDPipeline::~SDPipeline()
 bool32 SDPipeline::Create(void* pInfo)
 {
     TPipelineInfo* pPipelineInfo = SOFT_CAST(TPipelineInfo*, pInfo);
-    m_nVs = LoadShader(GL_VERTEX_SHADER, pPipelineInfo->pszVertexShaderFile);
-    m_nFs = LoadShader(GL_FRAGMENT_SHADER, pPipelineInfo->pszVertexShaderFile);
+    LoadShader(GL_VERTEX_SHADER, pPipelineInfo->pszVertexShaderFile, &m_nVs);
+    LoadShader(GL_FRAGMENT_SHADER, pPipelineInfo->pszFragmentShaderFile, &m_nFs);
 
     m_nProgram = glCreateProgram(); CHECKGL;
     glAttachShader(m_nProgram, m_nVs); CHECKGL;
@@ -42,9 +42,26 @@ bool32 SDPipeline::Create(void* pInfo)
         return false;
     }
 
+    GLint nLinkStatus = 0;
+    glGetProgramiv(m_nProgram, GL_LINK_STATUS, &nLinkStatus); CHECKGL;
+    if (nLinkStatus == GL_FALSE) {
+        GLint nLogLen = 0;
+        glGetProgramiv(m_nProgram, GL_INFO_LOG_LENGTH, &nLogLen); CHECKGL;
+        if (nLogLen == 0) {
+            ERROR_MSG("Link status failed, but info log is 0!");
+            return false;
+        } else {
+            GLchar* pszInfoLog = SOFT_CAST(GLchar*, calloc(nLogLen+1, sizeof(GLchar)));
+            glGetProgramInfoLog(m_nProgram, nLogLen+1, &nLogLen, pszInfoLog); CHECKGL;
+            ERROR_MSG("Link Log: %s", pszInfoLog);
+            free(pszInfoLog);
+            return false;
+        }
+    }
+
     m_eDepthFunc = GL_LEQUAL;
     m_eCullFace = GL_CCW;
-
+    return true;
 }
 
 void SDPipeline::Destroy()
@@ -79,12 +96,14 @@ void SDPipeline::SetCulling(bool32 bEnabled)
     m_bCullEnabled = bEnabled;
 }
 
-void SDPipeline::SetCullFace(GLenum eFace)
-{
+void SDPipeline::SetCullFace(GLenum eFace) {
     m_eCullFace = eFace;
 }
 
 void SDPipeline::Start() {
+    if (!glIsProgram(m_nProgram)) {
+        ERROR_MSG("Invalid program object!");
+    }
     glUseProgram(m_nProgram); CHECKGL;
     if (m_bAlphaEnabled) {
         glEnable(GL_BLEND); CHECKGL;
@@ -110,8 +129,9 @@ void SDPipeline::Start() {
         glDisable(GL_DEPTH_TEST); CHECKGL;
     }
 
-    glClearColor(0.0, 0.0, 0.0, 1.0); CHECKGL;
+    glClearColor(0.25f, 0.25f, 0.25f, 1.0); CHECKGL;
     glClear(GL_COLOR_BUFFER_BIT); CHECKGL;
+
 }
 
 void SDPipeline::End() {
@@ -122,23 +142,38 @@ void SDPipeline::End() {
 
 }
 
-GLuint SDPipeline::LoadShader(GLenum shaderType, const char* pSource)
-{
+void SDPipeline::LoadShader(GLenum shaderType, const char* pSource, GLuint* pShader) {
     GLuint nShader = glCreateShader(shaderType); CHECKGL;
     GLint nShaderLen = strlen(pSource);
     glShaderSource(nShader, 1, &pSource, &nShaderLen); CHECKGL;
     glCompileShader(nShader); CHECKGL;
-    return nShader;
+
+    GLint nCompiled = -1;
+    glGetShaderiv(nShader, GL_COMPILE_STATUS, &nCompiled);
+    if (!nCompiled) {
+        GLint infoLen = 0;
+        glGetShaderiv(nShader, GL_INFO_LOG_LENGTH, &infoLen);
+        if (infoLen) {
+            char* buf = SOFT_CAST(char*, calloc(infoLen, sizeof(char)));
+            if (buf) {
+                glGetShaderInfoLog(nShader, infoLen, NULL, buf);
+                ERROR_MSG("Could not compile shader %d:\n%s\n", shaderType, buf);
+                free(buf);
+            }
+            glDeleteShader(nShader);
+            nShader = 0;
+        }
+    }
+
+    *pShader = nShader;
 
 }
 
-GLuint SDPipeline::LoadShaderFile(GLenum shaderType, const char* pFile)
-{
+void SDPipeline::LoadShaderFile(GLenum shaderType, const char* pFile, GLuint* pShader) {
     FILE* pFileObj = fopen(pFile, "r");
-    if (pFileObj == NULL)
-    {
+    if (pFileObj == NULL) {
         ERROR_MSG("Failed to open shader file %s!", pFile);
-        return 0;
+        return;
     }
 
     fseek(pFileObj, 0, SEEK_END);
@@ -148,10 +183,7 @@ GLuint SDPipeline::LoadShaderFile(GLenum shaderType, const char* pFile)
     fread(pszFileContent, sizeof(char), nSize, pFileObj);
     fclose(pFileObj);
 
-    GLuint nShader = LoadShader(shaderType, pszFileContent);
+    LoadShader(shaderType, pszFileContent, pShader);
 
     free(pszFileContent);
-
-    return nShader;
-
 }

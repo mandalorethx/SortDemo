@@ -16,14 +16,18 @@ public:
     ~SortDemoRenderer();
 
     bool32 CreateRenderer(uint32 nWidth, uint32 nHeight);
-    bool32 AddMesh(const char* pszMeshFile);
+    bool32 AddMesh(const char* pszBasePath, const char* pszMeshFile);
     void   DrawFrame();
     void   DestroyRenderer();
+    void   UpdateViewport(uint32 nWidth, uint32 nHeight);
 private:
     uint32     m_nWidth;
     uint32     m_nHeight;
     SDStack    m_meshStack;
     SDPipeline m_pipeline;
+    uint32     m_nFrameNum;
+    double     m_fStartTime;
+    double     m_fLastTime;
 };
 
 

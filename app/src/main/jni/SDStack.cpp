@@ -4,81 +4,131 @@
 
 #include "SDStack.h"
 
-SDStack::SDStack()
-{
+SDStack::SDStack() {
     m_nNumElements = 0;
-    m_ppArray = NULL;
-}
-SDStack::~SDStack()
-{
-    delete[] m_ppArray;
+    m_pBack = NULL;
 }
 
-void   SDStack::PushBack(void* pItem)
-{
-    void** ppNewArray = new void*[m_nNumElements+1];
-    for (uint32 ii = 0; ii < m_nNumElements; ++ii)
-    {
-        ppNewArray[ii] = m_ppArray[ii];
+SDStack::~SDStack() {
+    if(m_pBack != NULL) {
+        while (m_nNumElements > 0) {
+            RemoveBack();
+        }
     }
-    ppNewArray[m_nNumElements] = pItem;
-    m_nNumElements++;
-
-    delete[] m_ppArray;
-
-    m_ppArray = ppNewArray;
-
 }
 
-void*  SDStack::GetBack()
-{
+void   SDStack::PushBack(void* pItem, size_t nSize /*= -1*/) {
+    TNode* pNewNode = SOFT_CAST(TNode*, calloc(sizeof(TNode), 1));
+    pNewNode->pFront = m_pBack;
+
+    if (nSize == -1) {
+//        pNewNode->nSize = sizeof(void*);
+//        pNewNode->pData = calloc(nSize, 1);
+//        memcpy(pNewNode->pData, &pItem, nSize);
+        pNewNode->nSize = -1;
+        pNewNode->pData = pItem;
+    } else {
+        pNewNode->nSize = nSize;
+        pNewNode->pData = calloc(nSize, 1);
+        memcpy(pNewNode->pData, pItem, nSize);
+    }
+
+
+    if (m_pBack != NULL) {
+        m_pBack->pBack = pNewNode;
+    }
+    m_pBack = pNewNode;
+    m_nNumElements++;
+}
+
+void*  SDStack::GetBack() {
     return GetItem(m_nNumElements-1);
 }
 
-void*  SDStack::GetFront()
-{
+void*  SDStack::GetFront() {
     return GetItem(0);
 }
 
-void*  SDStack::GetItem(uint32 nItem)
-{
-    return m_ppArray[nItem];
+void*  SDStack::GetItem(uint32 nItem) {
+    TNode* pCurNode = m_pBack;
+    uint32 nCount = m_nNumElements - 1;
+    while (pCurNode != NULL && nCount > nItem) {
+        pCurNode = pCurNode->pFront;
+        nCount--;
+    }
+
+    if (pCurNode == NULL) {
+        ERROR_MSG("Stack: No element %d to get!", nItem);
+        return NULL;
+    }
+
+    return pCurNode->pData;
 }
 
-void   SDStack::RemoveBack()
-{
+void   SDStack::RemoveBack() {
     RemoveItem(m_nNumElements-1);
 }
 
-void   SDStack::RemoveFront()
-{
+void   SDStack::RemoveFront() {
     RemoveItem(0);
 }
 
-void   SDStack::RemoveItem(uint32 nItem)
-{
-    void** ppNewArray = new void*[m_nNumElements-1];
-    uint32 nWriteItem = 0;
-    for (uint32 ii = 0; ii < m_nNumElements; ++ii)
-    {
-        if (ii != nItem) {
-            ppNewArray[nWriteItem] = m_ppArray[ii];
-            nWriteItem++;
-        }
+void   SDStack::RemoveItem(uint32 nItem) {
+    TNode* pCurNode = m_pBack;
+    uint32 nCount = m_nNumElements-1;
+    while (pCurNode != NULL && nCount > nItem) {
+        pCurNode = pCurNode->pFront;
+        nCount--;
     }
+
+    if (pCurNode == NULL) {
+        ERROR_MSG("Stack: No element %d to remove!", nItem);
+        return;
+    }
+
+    TNode* pTmp = pCurNode->pFront;
+    if (pCurNode->pBack != NULL) {
+        pCurNode->pBack->pFront = pTmp;
+    }
+
+    if (pTmp != NULL) {
+        pTmp->pBack = pCurNode->pBack;
+    }
+    if (pCurNode->nSize != -1) {
+        free(pCurNode->pData);
+    }
+
+    free(pCurNode);
     m_nNumElements--;
-
-    delete[] m_ppArray;
-
-    m_ppArray = ppNewArray;
 }
 
-uint32 SDStack::GetNumElements()
-{
+uint32 SDStack::GetNumElements() {
     return m_nNumElements;
 }
 
-void** SDStack::GetArray()
-{
-    return m_ppArray;
+void* SDStack::GetArray() {
+    size_t nTotalSize = 0;
+    TNode* pCurNode = m_pBack;
+    while (pCurNode != NULL) {
+        if (pCurNode->nSize == -1) {
+            nTotalSize += sizeof(void*);
+        } else {
+            nTotalSize += pCurNode->nSize;
+        }
+        pCurNode = pCurNode->pFront;
+    }
+
+    uint8* ppArray = SOFT_CAST(uint8*, calloc(nTotalSize, 1));
+    size_t nOffset = 0;
+    pCurNode = m_pBack;
+    while (pCurNode != NULL) {
+        size_t nCurSize = pCurNode->nSize;
+        if (nCurSize = -1) {
+            nCurSize = sizeof(void*);
+        }
+        memcpy(ppArray + nOffset, pCurNode->pData, nCurSize);
+        pCurNode = pCurNode->pFront;
+    }
+
+    return ppArray;
 }

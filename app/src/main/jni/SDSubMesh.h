@@ -22,7 +22,6 @@ public:
     struct TSubMeshInfo
     {
         uint32 nNumVertices;
-        uint32 nNumIndices;
     };
 
     struct TMaterial
@@ -40,8 +39,8 @@ public:
 
     enum EUniformLocation
     {
-        UNIFORM_TEXTURE,
         UNIFORM_MVP,
+        UNIFORM_TEXTURE,
         UNIFORM_KA,
         UNIFORM_KD,
         UNIFORM_KS,
@@ -60,7 +59,6 @@ public:
     virtual void   Destroy();
 
     bool32 UploadVertexData(TVec3* pPos, TVec3* pNormals, TVec3* pCoord);
-    bool32 UploadIndexData(uint32* pIndices);
     void   SetMaterial(TMaterial material){m_material=  material;};
     bool32 SetTexture(GLuint hTexId);
     bool32 SetMVP(TMat4 mMvp);
@@ -75,9 +73,7 @@ private:
         size_t             nOffset;
     };
     uint32            m_nVertexCount;
-    uint32            m_nIndexCount;
     GLuint            m_hVbo;
-    GLuint            m_hIbo;
     GLuint            m_hTexture;
     TMat4             m_mMvp;
     TMaterial         m_material;

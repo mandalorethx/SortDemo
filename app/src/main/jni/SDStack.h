@@ -9,10 +9,20 @@
 
 class SDStack {
 public:
+    struct TNode
+    {
+        TNode* pFront;
+        TNode* pBack;
+        void*  pData;
+        size_t nSize;
+
+        TNode() : pFront(NULL), pBack(NULL), pData(NULL), nSize(0) {}
+    };
+
     SDStack();
     ~SDStack();
 
-    void   PushBack(void* pItem);
+    void   PushBack(void* pItem, size_t nSize = -1);
     void*  GetBack();
     void*  GetFront();
     void*  GetItem(uint32 nItem);
@@ -23,10 +33,10 @@ public:
 
     uint32 GetNumElements();
 
-    void** GetArray();
+    void*  GetArray();
 private:
-    void** m_ppArray;
-    uint32 m_nNumElements;
+    TNode*  m_pBack;
+    int32   m_nNumElements;
 };
 
 

@@ -13,6 +13,7 @@ class SDMesh : public SDObject {
 public:
     struct TMeshInfo
     {
+        const char* pszBasePath;
         const char* pszMeshObjectFile;
     };
 

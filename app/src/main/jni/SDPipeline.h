@@ -31,8 +31,8 @@ public:
     void Start();
     void End();
 private:
-    GLuint LoadShader(GLenum shaderType, const char* pSource);
-    GLuint LoadShaderFile(GLenum shaderType, const char* pFile);
+    void LoadShader(GLenum shaderType, const char* pSource, GLuint* pShader);
+    void LoadShaderFile(GLenum shaderType, const char* pFile, GLuint* pShader);
 
     GLuint m_nVs;
     GLuint m_nFs;

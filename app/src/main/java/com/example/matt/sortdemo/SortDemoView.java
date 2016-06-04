@@ -284,13 +284,11 @@ public class SortDemoView extends GLSurfaceView {
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            SortDemoRenderer.destroy_renderer();
-            SortDemoRenderer.create_renderer(width, height);
-            SortDemoRenderer.add_mesh("Sphere.obj");
+            SortDemoRenderer.update_viewport(width, height);
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            // Do nothing.
+            SortDemoRenderer.create_renderer(0, 0);
         }
     }
 }

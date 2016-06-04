@@ -29,6 +29,7 @@ struct TVec2
     float y;
 
     TVec2() : x(0.0), y(0.0) {}
+    TVec2(float fX, float fY) : x(fX), y(fY) {}
 };
 
 struct TVec3
@@ -38,6 +39,7 @@ struct TVec3
     float z;
 
     TVec3() : x(0.0), y(0.0), z(0.0) {}
+    TVec3(float fX, float fY, float fZ) : x(fX), y(fY), z(fZ) {}
 };
 
 struct TVec4
@@ -48,6 +50,7 @@ struct TVec4
     float w;
 
     TVec4() : x(0.0), y(0.0), z(0.0), w(0.0) {}
+    TVec4(float fX, float fY, float fZ, float fW) : x(fX), y(fY), z(fZ), w(fW) {}
 };
 
 struct TMat4
@@ -90,6 +93,37 @@ static inline bool32 CheckGL(const char* pszFile, int32 nLine)
 
 #define SOFT_CAST(type, var) static_cast<type>(var)
 #define HARD_CAST(type, var) reinterpret_cast<type>(var)
-#define CONST_CASE(type, var) const_cast<type>(var)
+#define CONST_CAST(type, var) const_cast<type>(var)
+
+static const float PI = 3.141592654;
+
+#define SDMAX(x, y) (x > y ? x : y)
+#define SDMIN(x, y) (x < y ? x : y)
+
+struct TMaterialInfo
+{
+    TVec3 ambient;
+    TVec3 diffuse;
+    TVec3 specular;
+    TVec3 transmittance;
+    TVec3 emission;
+    float shininess;
+    float ior;      // index of refraction
+    float dissolve; // 1 == opaque; 0 == fully transparent
+    // illumination model (see http://www.fileformat.info/format/material/)
+    int32 illum;
+
+    int32 dummy; // Suppress padding warning.
+
+    char* ambient_texname;            // map_Ka
+    char* diffuse_texname;            // map_Kd
+    char* specular_texname;           // map_Ks
+    char* specular_highlight_texname; // map_Ns
+    char* bump_texname;               // map_bump, bump
+    char* displacement_texname;       // disp
+    char* alpha_texname;              // map_d
+};
+
+
 
 #endif //SORTDEMO_SHAREDDEFINES_H
